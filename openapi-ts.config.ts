@@ -1,5 +1,5 @@
 export default {
-  input: `https://api.${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/openapi/v1.json`,
+  input: `https://lazer-api${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/openapi/v1.json`,
   output: "lib/types/api",
   plugins: [
     "zod",

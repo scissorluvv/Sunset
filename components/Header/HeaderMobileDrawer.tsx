@@ -92,7 +92,7 @@ export default function HeaderMobileDrawer() {
       {
         icon: <BookCopy />,
         title: t("navigation.apiDocs"),
-        url: `https://api.${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/docs`,
+        url: `https://${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/docs`,
       },
     ];
 

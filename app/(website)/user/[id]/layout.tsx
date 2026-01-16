@@ -29,7 +29,7 @@ export async function generateMetadata(props: {
       title: t("title", { username: user.username }),
       description: t("description", { username: user.username }),
       images: [
-        `https://a.${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/avatar/${user.user_id}`,
+        `https://lazer-api.${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/users/${user.user_id}/avatar`,
       ],
     },
   };

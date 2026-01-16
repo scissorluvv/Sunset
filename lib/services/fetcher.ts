@@ -22,7 +22,7 @@ async function errorInterceptor(error: HTTPError) {
 }
 
 export const kyInstance = ky.create({
-  prefixUrl: `https://api.${process.env.NEXT_PUBLIC_SERVER_DOMAIN}`,
+  prefixUrl: `https://lazer-api.${process.env.NEXT_PUBLIC_SERVER_DOMAIN}`,
   hooks: {
     beforeError: [errorInterceptor],
   },

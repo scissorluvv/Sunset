@@ -25,8 +25,8 @@ export async function GET(request: Request) {
 
     const token = authHeader.slice(7);
 
-    const apiBaseUrl = `https://api.${process.env.NEXT_PUBLIC_SERVER_DOMAIN}`;
-    const userResponse = await fetch(`${apiBaseUrl}/user/self`, {
+    const apiBaseUrl = `https://lazer-api.${process.env.NEXT_PUBLIC_SERVER_DOMAIN}`;
+    const userResponse = await fetch(`${apiBaseUrl}/api/v2/me/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
