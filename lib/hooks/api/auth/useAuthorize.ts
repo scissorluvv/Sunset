@@ -8,7 +8,7 @@ export function useAuthorize() {
 }
 
 async function authorize(url: string, { arg }: { arg: PostAuthTokenData["body"] }) {
-  return await poster<PostAuthTokenResponse>(`auth/token`, {
+  return await poster<PostAuthTokenResponse>(`oauth/token`, {
     json: {
       ...arg,
     },

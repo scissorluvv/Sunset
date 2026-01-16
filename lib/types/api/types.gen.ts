@@ -908,7 +908,7 @@ export type PostAuthTokenData = {
   body?: TokenRequest;
   path?: never;
   query?: never;
-  url: "/auth/token";
+  url: "/oauth/token";
 };
 
 export type PostAuthTokenErrors = {
