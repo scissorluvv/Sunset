@@ -905,7 +905,7 @@ export type WebSocketMessage = {
 };
 
 export type PostAuthTokenData = {
-  body: TokenRequest;   // <- required
+  body: TokenRequest;
   path?: never;
   query?: never;
   url: "/oauth/token";

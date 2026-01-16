@@ -1,7 +1,7 @@
-import type { PostAuthTokenData, PostAuthTokenResponse } from "@/lib/types/api";
-import poster from "@/lib/services/poster";
-
 import useSWRMutation from "swr/mutation";
+
+import poster from "@/lib/services/poster";
+import type { PostAuthTokenData, PostAuthTokenResponse } from "@/lib/types/api";
 
 export function useAuthorize() {
   return useSWRMutation("user/self", authorize);
