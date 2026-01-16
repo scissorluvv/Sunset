@@ -1,27 +1,38 @@
-import useSWRMutation from "swr/mutation";
+import type { Options } from "ky";
 
-import poster from "@/lib/services/poster";
-import type { PostAuthTokenData, PostAuthTokenResponse } from "@/lib/types/api";
+import { getUserToken } from "@/lib/actions/getUserToken";
+import { kyInstance } from "@/lib/services/fetcher";
 
-export function useAuthorize() {
-  return useSWRMutation("user/self", authorize);
+export async function poster<T>(url: string, options?: Options) {
+  const isOAuth = url.startsWith("oauth/");
+  const token = isOAuth ? null : await getUserToken();
+
+  const result = await kyInstance
+    .post<T>(url, {
+      ...options,
+      headers: {
+        ...options?.headers,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    })
+    .then(async (res) => {
+      const contentType = res?.headers?.get("content-type");
+
+      if (!(contentType != null && contentType.includes("application/json")))
+        return res;
+
+      try {
+        return await res.json();
+      }
+      catch {
+        return null;
+      }
+    });
+
+  if (!result)
+    throw new Error("Unknown error");
+
+  return result as T;
 }
 
-async function authorize(_key: string, { arg }: { arg: PostAuthTokenData["body"] }) {
-  if (!arg)
-    throw new Error("Missing token request body");
-
-  const body = new URLSearchParams();
-
-  for (const [k, v] of Object.entries(arg)) {
-    if (v == null)
-      continue;
-
-    body.set(k, String(v));
-  }
-
-  return poster<PostAuthTokenResponse>("oauth/token", {
-    body,
-    headers: { "content-type": "application/x-www-form-urlencoded" },
-  });
-}
+export default poster;
