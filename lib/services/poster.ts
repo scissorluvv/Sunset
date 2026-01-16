@@ -11,25 +11,27 @@ async function poster<T>(url: string, options?: Options) {
     .post<T>(url, {
       ...options,
       headers: {
-        ...(options?.headers ?? {}),
+        ...options?.headers,
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     })
     .then(async (res) => {
       const contentType = res?.headers?.get("content-type");
 
-      if (!(contentType != null && contentType.includes("application/json"))) {
+      if (!(contentType != null && contentType.includes("application/json")))
         return res;
-      }
 
       try {
         return await res.json();
-      } catch {
+      }
+      catch {
         return null;
       }
     });
 
-  if (!result) throw new Error("Unknown error");
+  if (!result)
+    throw new Error("Unknown error");
+
   return result as T;
 }
 
