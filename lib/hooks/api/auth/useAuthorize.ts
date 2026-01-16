@@ -7,6 +7,8 @@ export function useAuthorize() {
 }
 
 async function authorize(_key: string, { arg }: { arg: PostAuthTokenData["body"] }) {
+  if (!arg) throw new Error("Missing token request body");
+
   const body = new URLSearchParams();
   for (const [k, v] of Object.entries(arg)) {
     if (v == null) continue;
