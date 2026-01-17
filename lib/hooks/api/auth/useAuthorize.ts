@@ -13,6 +13,7 @@ async function authorize(_key: string, { arg }: { arg: PostAuthTokenData["body"]
 
   const body = new URLSearchParams();
 
+  // Copy whatever your TokenRequest provides (username/password/grant_type/etc.)
   for (const [k, v] of Object.entries(arg)) {
     if (v == null)
       continue;
@@ -20,13 +21,14 @@ async function authorize(_key: string, { arg }: { arg: PostAuthTokenData["body"]
     body.set(k, String(v));
   }
 
+  // Force correct client creds + scope for your server
+  body.set("client_id", "6");
+  body.set("client_secret", "510664d5dee21a71701442b96d0a367a6969ea1cbda860bc770ffcb9b80660e9442ae4543004ee6c");
+  body.set("grant_type", "password");
+  body.set("scope", "*");
+
   return poster<PostAuthTokenResponse>("oauth/token", {
-    body: new URLSearchParams({
-      grant_type: "client_credentials",
-      client_id: "6",
-      client_secret: "510664d5dee21a71701442b96d0a367a6969ea1cbda860bc770ffcb9b80660e9442ae4543004ee6c",
-      scope: "public",
-    }),
-    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body,
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
   });
 }
