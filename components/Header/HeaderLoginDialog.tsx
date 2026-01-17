@@ -45,7 +45,6 @@ if (!TURNSTILE_SITE_KEY_ENV) {
 
 const TURNSTILE_SITE_KEY: string = TURNSTILE_SITE_KEY_ENV;
 
-
 export default function HeaderLoginDialog() {
   const t = useT("components.headerLoginDialog");
   const [error, setError] = useState("");
