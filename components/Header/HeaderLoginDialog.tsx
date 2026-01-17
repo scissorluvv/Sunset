@@ -37,11 +37,14 @@ import useRestriction from "@/lib/hooks/useRestriction";
 import useSelf from "@/lib/hooks/useSelf";
 import { useT } from "@/lib/i18n/utils";
 
-const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+const TURNSTILE_SITE_KEY_ENV = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
-if (!TURNSTILE_SITE_KEY) {
+if (!TURNSTILE_SITE_KEY_ENV) {
   throw new Error("NEXT_PUBLIC_TURNSTILE_SITE_KEY is not set");
 }
+
+const TURNSTILE_SITE_KEY: string = TURNSTILE_SITE_KEY_ENV;
+
 
 export default function HeaderLoginDialog() {
   const t = useT("components.headerLoginDialog");
