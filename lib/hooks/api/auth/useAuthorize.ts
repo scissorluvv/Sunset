@@ -1,19 +1,22 @@
 import useSWRMutation from "swr/mutation";
 
 import poster from "@/lib/services/poster";
-import type { PostAuthTokenData, PostAuthTokenResponse } from "@/lib/types/api";
+import type { PostAuthTokenResponse, TokenRequest } from "@/lib/types/api";
+
+type TokenRequestWithTurnstile = TokenRequest & {
+  cf_turnstile_response?: string;
+};
 
 export function useAuthorize() {
   return useSWRMutation("api/v2/me/", authorize);
 }
 
-async function authorize(_key: string, { arg }: { arg: PostAuthTokenData["body"] }) {
+async function authorize(_key: string, { arg }: { arg: TokenRequestWithTurnstile | undefined }) {
   if (!arg)
     throw new Error("Missing token request body");
 
   const body = new URLSearchParams();
 
-  // Copy whatever your TokenRequest provides (username/password/grant_type/etc.)
   for (const [k, v] of Object.entries(arg)) {
     if (v == null)
       continue;
@@ -21,9 +24,9 @@ async function authorize(_key: string, { arg }: { arg: PostAuthTokenData["body"]
     body.set(k, String(v));
   }
 
-  // Force correct client creds + scope for your server
+  // force your web client creds (optional, if not already in arg)
   body.set("client_id", "6");
-  body.set("client_secret", "510664d5dee21a71701442b96d0a367a6969ea1cbda860bc770ffcb9b80660e9442ae4543004ee6c");
+  body.set("client_secret", process.env.NEXT_PUBLIC_OSU_WEB_CLIENT_SECRET ?? "");
   body.set("grant_type", "password");
   body.set("scope", "*");
 
