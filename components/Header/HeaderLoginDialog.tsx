@@ -39,9 +39,9 @@ import { useT } from "@/lib/i18n/utils";
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
-if (!TURNSTILE_SITE_KEY)
+if (!TURNSTILE_SITE_KEY) {
   throw new Error("NEXT_PUBLIC_TURNSTILE_SITE_KEY is not set");
-
+}
 export default function HeaderLoginDialog() {
   const t = useT("components.headerLoginDialog");
   const [error, setError] = useState("");
@@ -171,8 +171,7 @@ export default function HeaderLoginDialog() {
               )}
             />
 
-            <div className="flex justify-center">
-              <Turnstile
+            <Turnstile
                 ref={turnstileRef}
                 siteKey={TURNSTILE_SITE_KEY}
                 onSuccess={handleTurnstileSuccess}
