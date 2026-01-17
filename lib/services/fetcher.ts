@@ -31,7 +31,7 @@ export const kyInstance = ky.create({
 async function fetcher<T>(url: string, options?: Options) {
   const token = await getUserToken();
 
-  if (!token && url.includes("user/self")) {
+  if (!token && url.includes("api/v2/me")) {
     throw new Error("Unauthorized");
   }
 

@@ -1820,7 +1820,7 @@ export type GetUserSelfData = {
   body?: never;
   path?: never;
   query?: never;
-  url: "/user/self";
+  url: "/api/v2/me";
 };
 
 export type GetUserSelfErrors = {
@@ -1851,7 +1851,7 @@ export type GetUserSelfByModeData = {
     mode: GameMode;
   };
   query?: never;
-  url: "/user/self/{mode}";
+  url: "/api/v2/me/{mode}";
 };
 
 export type GetUserSelfByModeErrors = {
