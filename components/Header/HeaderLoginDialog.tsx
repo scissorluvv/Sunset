@@ -4,9 +4,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import * as React from "react";
-import { useContext, useMemo, useState } from "react";
+import { useCallback, useContext, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { Turnstile } from "@marsidev/react-turnstile";
 
 import { MobileDrawerContext } from "@/components/Header/HeaderMobileDrawer";
 import { Button } from "@/components/ui/button";
@@ -36,9 +38,14 @@ import useRestriction from "@/lib/hooks/useRestriction";
 import useSelf from "@/lib/hooks/useSelf";
 import { useT } from "@/lib/i18n/utils";
 
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "1x00000000000000000000AA";
+
 export default function HeaderLoginDialog() {
   const t = useT("components.headerLoginDialog");
   const [error, setError] = useState("");
+
+  const [turnstileToken, setTurnstileToken] = useState<string>("");
+  const turnstileRef = useRef<any>(null);
 
   const router = useRouter();
 
@@ -46,48 +53,48 @@ export default function HeaderLoginDialog() {
   const { toast } = useToast();
 
   const { setSelfRestricted } = useRestriction();
-  const { trigger: triggerAuthorize } = useAuthorize();
+  const { trigger: triggerAuthorize, isMutating } = useAuthorize();
 
   const setMobileDrawerOpen = useContext(MobileDrawerContext);
 
   const formSchema = useMemo(
     () =>
       z.object({
-        username: z
-          .string()
-          .min(2, {
-            message: t("validation.usernameMinLength"),
-          })
-          .max(32, {
-            message: t("validation.usernameMaxLength"),
-          }),
-        password: z
-          .string()
-          .min(8, {
-            message: t("validation.passwordMinLength"),
-          })
-          .max(32, {
-            message: t("validation.passwordMaxLength"),
-          }),
+        username: z.string().min(2, { message: t("validation.usernameMinLength") }).max(32, { message: t("validation.usernameMaxLength") }),
+        password: z.string().min(8, { message: t("validation.passwordMinLength") }).max(32, { message: t("validation.passwordMaxLength") }),
       }),
     [t],
   );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      username: "",
-      password: "",
-    },
+    defaultValues: { username: "", password: "" },
   });
 
+  const handleTurnstileSuccess = useCallback((token: string) => {
+    setTurnstileToken(token);
+  }, []);
+
+  const handleTurnstileReset = useCallback(() => {
+    setTurnstileToken("");
+    turnstileRef.current?.reset?.();
+  }, []);
+
   function onSubmit(values: z.infer<typeof formSchema>) {
+    setError("");
+
+    if (!turnstileToken) {
+      setError("Please complete the verification.");
+      return;
+    }
+
     const { username, password } = values;
 
     triggerAuthorize(
       {
         username,
         password,
+        cf_turnstile_response: turnstileToken,
       },
       {
         onSuccess(data) {
@@ -101,20 +108,20 @@ export default function HeaderLoginDialog() {
 
           revalidate();
 
-          toast({
-            title: t("toast.success"),
-            variant: "success",
-          });
+          toast({ title: t("toast.success"), variant: "success" });
+
+          handleTurnstileReset();
         },
         onError(err) {
           const errorMessage = err.message ?? "Unknown error";
 
-          if (errorMessage?.includes("restrict")) {
+          if (errorMessage.includes("restrict")) {
             setSelfRestricted(true, errorMessage);
             return;
           }
 
           setError(errorMessage || "Unknown error");
+          handleTurnstileReset();
         },
       },
     );
@@ -125,6 +132,7 @@ export default function HeaderLoginDialog() {
       <DialogTrigger asChild>
         <Button variant="outline">{t("signIn")}</Button>
       </DialogTrigger>
+
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{t("title")}</DialogTitle>
@@ -132,7 +140,7 @@ export default function HeaderLoginDialog() {
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="username"
@@ -146,6 +154,7 @@ export default function HeaderLoginDialog() {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="password"
@@ -153,27 +162,28 @@ export default function HeaderLoginDialog() {
                 <FormItem>
                   <FormLabel>{t("password.label")}</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
-                      placeholder={t("password.placeholder")}
-                      {...field}
-                    />
+                    <Input type="password" placeholder={t("password.placeholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {error && (
-              <p className="mx-auto text-sm text-destructive">{error}</p>
-            )}
+
+            <div className="flex justify-center">
+              <Turnstile
+                ref={turnstileRef}
+                siteKey={TURNSTILE_SITE_KEY}
+                onSuccess={handleTurnstileSuccess}
+                onError={handleTurnstileReset}
+                onExpire={handleTurnstileReset}
+                options={{ theme: "auto", size: "normal" }}
+              />
+            </div>
+
+            {error && <p className="mx-auto text-sm text-destructive">{error}</p>}
+
             <DialogFooter>
-              <Button
-                onClick={() => {
-                  // eslint-disable-next-line @typescript-eslint/no-unused-expressions -- TODO: I assume this was a typo?
-                  MobileDrawerContext.Provider;
-                }}
-                type="submit"
-              >
+              <Button type="submit" disabled={isMutating || !turnstileToken}>
                 {t("login")}
               </Button>
             </DialogFooter>
@@ -182,7 +192,7 @@ export default function HeaderLoginDialog() {
 
         <Separator className="my-2" />
 
-        <div className="flex flex-row justify-between ">
+        <div className="flex flex-row justify-between">
           <DialogClose asChild>
             <Button
               variant="link"
