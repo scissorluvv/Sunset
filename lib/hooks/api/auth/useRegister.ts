@@ -7,7 +7,7 @@ import type {
 } from "@/lib/types/api";
 
 export function useRegister() {
-  return useSWRMutation(`api/v2/me`, register);
+  return useSWRMutation(`api/v2/me/`, register);
 }
 
 async function register(url: string, { arg }: { arg: PostAuthRegisterData["body"] }) {

@@ -1820,7 +1820,7 @@ export type GetUserSelfData = {
   body?: never;
   path?: never;
   query?: never;
-  url: "/api/v2/me";
+  url: "/api/v2/me/";
 };
 
 export type GetUserSelfErrors = {

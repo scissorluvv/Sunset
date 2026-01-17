@@ -4,7 +4,7 @@ import poster from "@/lib/services/poster";
 import type { PostAuthTokenData, PostAuthTokenResponse } from "@/lib/types/api";
 
 export function useAuthorize() {
-  return useSWRMutation("api/v2/me", authorize);
+  return useSWRMutation("api/v2/me/", authorize);
 }
 
 async function authorize(_key: string, { arg }: { arg: PostAuthTokenData["body"] }) {

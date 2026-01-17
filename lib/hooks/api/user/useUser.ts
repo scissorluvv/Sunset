@@ -5,7 +5,7 @@ import useSWR from "swr";
 import type { GameMode, UserResponse, UserWithStats } from "@/lib/types/api";
 
 export function useUserSelf() {
-  return useSWR<UserResponse>("api/v2/me");
+  return useSWR<UserResponse>("api/v2/me/");
 }
 
 export function useUser(id: number | null) {
