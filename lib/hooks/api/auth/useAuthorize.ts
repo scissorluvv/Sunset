@@ -23,8 +23,8 @@ async function authorize(_key: string, { arg }: { arg: PostAuthTokenData["body"]
   return poster<PostAuthTokenResponse>("oauth/token", {
     body: new URLSearchParams({
       grant_type: "client_credentials",
-      client_id: "5",
-      client_secret: "FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk",
+      client_id: "6",
+      client_secret: "510664d5dee21a71701442b96d0a367a6969ea1cbda860bc770ffcb9b80660e9442ae4543004ee6c",
       scope: "public",
     }),
     headers: { "content-type": "application/x-www-form-urlencoded" },
