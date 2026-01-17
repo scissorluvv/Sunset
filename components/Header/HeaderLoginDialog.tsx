@@ -42,6 +42,7 @@ const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 if (!TURNSTILE_SITE_KEY) {
   throw new Error("NEXT_PUBLIC_TURNSTILE_SITE_KEY is not set");
 }
+
 export default function HeaderLoginDialog() {
   const t = useT("components.headerLoginDialog");
   const [error, setError] = useState("");
@@ -171,7 +172,8 @@ export default function HeaderLoginDialog() {
               )}
             />
 
-            <Turnstile
+            <div className="flex justify-center">
+              <Turnstile
                 ref={turnstileRef}
                 siteKey={TURNSTILE_SITE_KEY}
                 onSuccess={handleTurnstileSuccess}
@@ -180,7 +182,6 @@ export default function HeaderLoginDialog() {
                 options={{ theme: "auto", size: "normal" }}
               />
             </div>
-
             {error && <p className="mx-auto text-sm text-destructive">{error}</p>}
 
             <DialogFooter>
